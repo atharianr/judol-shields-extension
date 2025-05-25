@@ -1,0 +1,41 @@
+{
+    "name": "JudolShields #SayNoToJudol",
+    "description": "Helps you to prevent to see online gambling sites or ads. #MasaDepanLebihBaikTanpaJudol",
+    "version": "0.0.1",
+    "manifest_version": 3,
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "assets/icons/JudolShieldsLogo_Icon16.png",
+            "32": "assets/icons/JudolShieldsLogo_Icon32.png",
+            "48": "assets/icons/JudolShieldsLogo_Icon48.png",
+            "128": "assets/icons/JudolShieldsLogo_Icon128.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "content.js"
+            ],
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "storage",
+        "scripting",
+        "activeTab"
+    ],
+    "icons": {
+        "16": "assets/icons/JudolShieldsLogo_Icon16.png",
+        "32": "assets/icons/JudolShieldsLogo_Icon32.png",
+        "48": "assets/icons/JudolShieldsLogo_Icon48.png",
+        "128": "assets/icons/JudolShieldsLogo_Icon128.png"
+    }
+}
