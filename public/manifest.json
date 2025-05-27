@@ -38,5 +38,15 @@
         "32": "assets/icons/JudolShieldsLogo_Icon32.png",
         "48": "assets/icons/JudolShieldsLogo_Icon48.png",
         "128": "assets/icons/JudolShieldsLogo_Icon128.png"
-    }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "model/*"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
 }

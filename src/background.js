@@ -1,12 +1,17 @@
 import axios from 'axios';
+import * as tf from '@tensorflow/tfjs';
 
 console.log("[SCRIPT LOADED] BACKGROUND.JS");
 
 class BackgroundService {
     constructor() {
         this.API_BASE = "https://regex.bism.app/api/v1";
+        this.LABELS = ["drawings", "hentai", "neutral", "porn", "sexy"];
+        this.model = null;
+
         this.init();
         this.setupMessageListener();
+        this.loadModel();
     }
 
     async init() {
@@ -43,6 +48,53 @@ class BackgroundService {
         }
     }
 
+    async loadModel() {
+        const modelURL = chrome.runtime.getURL('model/model.json');
+        console.log('[Background] Loading TF model...');
+        this.model = await tf.loadGraphModel(modelURL);
+        console.log('[Background] Model loaded.');
+    }
+
+    async classifyImageTensor(imageTensor) {
+        if (!this.model) await this.loadModel();
+        const prediction = this.model.predict(imageTensor);
+        const data = await prediction.data();
+
+        const results = Array.from(data).map((score, idx) => ({
+            label: this.LABELS[idx],
+            score,
+        }));
+
+        prediction.dispose();
+
+        results.sort((a, b) => b.score - a.score);
+        return results[0];
+    }
+
+    async base64ToTensor(base64Image) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await fetch(base64Image);
+                const blob = await response.blob();
+                const bitmap = await createImageBitmap(blob);
+
+                const offscreen = new OffscreenCanvas(224, 224);
+                const ctx = offscreen.getContext('2d');
+                ctx.drawImage(bitmap, 0, 0, 224, 224);
+
+                const imageData = ctx.getImageData(0, 0, 224, 224);
+                const tensor = tf.browser.fromPixels(imageData)
+                    .toFloat()
+                    .div(tf.scalar(255.0))
+                    .expandDims();
+
+                resolve(tensor);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
     setupMessageListener() {
         chrome.runtime.onInstalled.addListener(() => {
             chrome.contextMenus.create({
@@ -76,6 +128,23 @@ class BackgroundService {
                     sendResponse(result);
                 })();
                 return true; // keep sendResponse channel open
+            }
+
+            // New message handler for image classification
+            if (message.type === "classifyImage") {
+                (async () => {
+                    try {
+                        const tensor = await this.base64ToTensor(message.payload);
+                        const result = await this.classifyImageTensor(tensor);
+                        tensor.dispose();
+                        console.log("[onMessage] Image classified:", result);
+                        sendResponse(result);
+                    } catch (err) {
+                        console.error("[onMessage] classifyImage error:", err);
+                        sendResponse(null);
+                    }
+                })();
+                return true; // async response
             }
 
             return false;
