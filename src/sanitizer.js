@@ -52,11 +52,21 @@ export default class Sanitizer {
         parent.removeChild(node);
     }
 
+    // sanitizeImages(root = document.body) {
+    //     const images = root.querySelectorAll('img');
+    //     images.forEach(img => {
+    //         img.style.filter = 'blur(10px)';
+    //         // img.style.transition = 'filter 0.3s ease';
+    //     });
+    // }
+
+
     sanitizeAll(node) {
         if (node.nodeType === Node.ELEMENT_NODE && ["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(node.tagName)) return;
         if (node.nodeType === Node.TEXT_NODE) {
-            this.sanitizeTextNode(node);
+            this.sanitizeTextNode(node); // For Text
         } else {
+            // this.sanitizeImages(node); // For Image
             node.childNodes.forEach(child => this.sanitizeAll(child));
         }
     }

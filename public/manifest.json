@@ -21,7 +21,7 @@
                 "http://*/*",
                 "https://*/*"
             ],
-            "run_at": "document_idle"
+            "run_at": "document_start"
         }
     ],
     "background": {
@@ -30,7 +30,8 @@
     "permissions": [
         "storage",
         "scripting",
-        "activeTab"
+        "activeTab",
+        "contextMenus"
     ],
     "icons": {
         "16": "assets/icons/JudolShieldsLogo_Icon16.png",

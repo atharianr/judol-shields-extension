@@ -19,11 +19,21 @@ export default class OverlayManager {
             zIndex: '9999',
         });
 
-        document.body.appendChild(this.overlay);
+        this.ensureBody(() => {
+            document.body.appendChild(this.overlay);
 
-        // Use React to render into the overlay
-        const root = createRoot(this.overlay);
-        root.render(<OverlayContent />);
+            // Use React to render into the overlay
+            const root = createRoot(this.overlay);
+            root.render(<OverlayContent />);
+        });
+    }
+
+    ensureBody(callback) {
+        if (document.body) {
+            callback();
+        } else {
+            requestAnimationFrame(() => this.ensureBody(callback));
+        }
     }
 
     show() {

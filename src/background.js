@@ -44,6 +44,28 @@ class BackgroundService {
     }
 
     setupMessageListener() {
+        chrome.runtime.onInstalled.addListener(() => {
+            chrome.contextMenus.create({
+                id: "judolshields_report_context",
+                title: "Laporkan teks ini ke JudolShields", // Judul menu yang ramah
+                contexts: ["selection"],
+            });
+        });
+
+        chrome.contextMenus.onClicked.addListener((info, tab) => {
+            if (info.menuItemId === "judolshields_report_context") {
+                const selectedText = info.selectionText;
+
+                chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    func: (text) => {
+                        alert(`👍 Terima kasih! Kamu baru saja melaporkan:\n\n"${text}"\n\nke tim JudolShields.`);
+                    },
+                    args: [selectedText]
+                });
+            }
+        });
+
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             console.log("[onMessage] Received:", message.type);
 
