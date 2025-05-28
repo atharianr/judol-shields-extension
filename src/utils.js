@@ -37,4 +37,9 @@ export default class Utils {
 
         return cleanHead.innerHTML;
     }
+
+    static normalizeUnicode(text) {
+        const normalizedText = text.normalize("NFKC") ?? "";
+        return normalizedText;
+    }
 }

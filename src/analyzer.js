@@ -26,8 +26,7 @@ export default class Analyzer {
             if (!response?.isJudol) {
                 this.overlayManager.hide();
             } else {
-                // window.location.replace("https://shields.atharianr.dev/");
-                window.location.replace("http://localhost:3000/");
+                window.location.replace("https://shields.atharianr.dev/");
             }
         });
     }

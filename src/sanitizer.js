@@ -18,7 +18,7 @@ export default class Sanitizer {
             Utils.isEditableElement(node.parentElement) || Utils.isInsideEditable(node)) return;
 
         const parent = node.parentElement;
-        const text = node.textContent;
+        const text = Utils.normalizeUnicode(node.textContent);
         let currentIndex = 0, replaced = false;
         const fragments = [];
 
