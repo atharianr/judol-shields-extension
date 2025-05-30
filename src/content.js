@@ -36,6 +36,7 @@ function init() {
         sanitizer.loadFromCache(() => {
             // Blur immediately after DOM is ready
             onReady(() => {
+                console.log("onReady")
                 sanitizer.sanitizeAll(document.body);
                 observerManager.setup();
             });

@@ -40,3 +40,4 @@ webpack.cache.js
 
 # Additional
 src/old
+*.zip

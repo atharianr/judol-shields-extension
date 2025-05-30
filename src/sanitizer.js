@@ -18,19 +18,24 @@ export default class Sanitizer {
             Utils.isEditableElement(node.parentElement) || Utils.isInsideEditable(node)) return;
 
         const parent = node.parentElement;
-        const text = Utils.normalizeUnicode(node.textContent);
+        // const text = Utils.normalizeUnicode(node.textContent);
+        const text = node.textContent
         let currentIndex = 0, replaced = false;
         const fragments = [];
 
         this.regexList.forEach(regex => {
             regex.lastIndex = 0;
             let match;
+            console.log("text -> ", text)
+            console.log('[sanitizeTextNode] -> ', (match = regex.exec(text)) !== null)
+
             while ((match = regex.exec(text)) !== null) {
                 const before = text.slice(currentIndex, match.index);
                 if (before) fragments.push(document.createTextNode(before));
 
                 const span = document.createElement("span");
                 span.textContent = match[0];
+                console.log("match")
                 Object.assign(span.style, {
                     filter: "blur(5px)",
                     backgroundColor: "#0001",

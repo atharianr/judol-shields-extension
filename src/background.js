@@ -59,7 +59,7 @@ class BackgroundService {
         chrome.runtime.onInstalled.addListener(() => {
             chrome.contextMenus.create({
                 id: "judolshields_report_context",
-                title: "Laporkan teks ini ke JudolShields", // Judul menu yang ramah
+                title: "Laporkan teks ini ke JudolShields",
                 contexts: ["selection"],
             });
         });
