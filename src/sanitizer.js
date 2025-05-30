@@ -25,6 +25,7 @@ export default class Sanitizer {
         this.regexList.forEach(regex => {
             regex.lastIndex = 0;
             let match;
+
             while ((match = regex.exec(text)) !== null) {
                 const before = text.slice(currentIndex, match.index);
                 if (before) fragments.push(document.createTextNode(before));

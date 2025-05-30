@@ -23,7 +23,7 @@ export default class Analyzer {
             payload: { domain: fullUrl, header: cleaned }
         }, response => {
             console.log("[analyzeWebsite]", response);
-            if (!response?.isJudol) {
+            if (!response?.is_judol) {
                 this.overlayManager.hide();
             } else {
                 window.location.replace("https://shields.atharianr.dev/");
