@@ -67,14 +67,23 @@ class BackgroundService {
         chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             if (info.menuItemId === "judolshields_report_context") {
                 const selectedText = Utils.normalizeUnicode(info.selectionText);
-
-                if (selectedText.length > 150) {
+                
+                if (selectedText.length < 20) {
                     chrome.scripting.executeScript({
                         target: { tabId: tab.id },
                         func: (message) => {
                             alert(message);
                         },
-                        args: ["Ups! Teksnya kepanjangan nih, pilih yang lebih singkat dulu yuk."]
+                        args: ["Ups! Teksnya masih terlalu pendek nih, coba pilih lebih dari 20 karakter yaa 😊"]
+                    });
+                    return;
+                } else if (selectedText.length > 900) {
+                    chrome.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        func: (message) => {
+                            alert(message);
+                        },
+                        args: ["Ups! Teksnya kepanjangan nih, pilih yang lebih singkat dulu yuk. Maksinal 900 karakter yaa 😊"]
                     });
                     return;
                 }
