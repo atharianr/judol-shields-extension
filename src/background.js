@@ -61,7 +61,6 @@ class BackgroundService {
     }
 
     async loadModel() {
-        // const modelURL = chrome.runtime.getURL('model/nsfw/model.json');
         const modelURL = chrome.runtime.getURL('model/gambling-classification/model.json');
         console.log('[Background] Loading TF model...');
         this.model = await tf.loadGraphModel(modelURL);
