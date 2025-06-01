@@ -8,31 +8,18 @@ import Sanitizer from './sanitizer.js';
 console.log("[SCRIPT LOADED] CONTENT.JS");
 
 async function classifyImageElementViaBackground(element) {
-    try {
-        // Convert image element to base64
-        const canvas = document.createElement('canvas');
-        canvas.width = element.naturalWidth;
-        canvas.height = element.naturalHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(element, 0, 0);
+    const src = element.src;
 
-        const base64 = canvas.toDataURL('image/jpeg');
-
-        // Send base64 image to background for classification
-        return new Promise((resolve) => {
-            chrome.runtime.sendMessage({ type: "classifyImage", payload: base64 }, (response) => {
-                if (chrome.runtime.lastError) {
-                    console.error("[Content] Error sending message to background:", chrome.runtime.lastError);
-                    resolve(null);
-                } else {
-                    resolve(response);
-                }
-            });
+    return new Promise((resolve) => {
+        chrome.runtime.sendMessage({ type: "classifyImageUrl", payload: src }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error("[Content] Error sending message to background:", chrome.runtime.lastError);
+                resolve(null);
+            } else {
+                resolve(response);
+            }
         });
-    } catch (err) {
-        console.error("[Content] classifyImageElementViaBackground error:", err);
-        return null;
-    }
+    });
 }
 
 function blurImage(imgElement) {
@@ -69,13 +56,15 @@ function init() {
         const sanitizer = new Sanitizer();
         const overlayManager = new OverlayManager();
         const analyzer = new Analyzer(overlayManager);
-        const observerManager = new ObserverManager(sanitizer);
+        // const observerManager = new ObserverManager(sanitizer);
+        const observerManager = new ObserverManager(sanitizer, classifyImageElementViaBackground);
+
 
         sanitizer.loadFromCache(() => {
             // Blur immediately after DOM is ready
             onReady(() => {
-                const MIN_WIDTH = 100;
-                const MIN_HEIGHT = 100;
+                const MIN_WIDTH = 50;
+                const MIN_HEIGHT = 50;
 
                 const images = document.querySelectorAll('img');
 
@@ -84,6 +73,7 @@ function init() {
                         return;
                     }
 
+
                     blurImage(img);  // Immediately blur the image
 
                     const handleClassification = () => {
@@ -91,9 +81,10 @@ function init() {
                             if (result) {
                                 console.log(`🧠 [${i}] Prediction: ${result.label} (${(result.score * 100).toFixed(2)}%)`);
 
+                                // if (['hentai', 'porn', 'sexy'].includes(result.label)) {
                                 if (result.label == 'judol') {
                                     // Keep blurred
-                                    console.log(`🔒 [${i}] Image kept blurred due to label: ${result.label}`);
+                                    // console.log(`🔒 [${i}] Image kept blurred due to label: ${result.label}`);
                                 } else {
                                     // Safe, unblur it
                                     unblurImage(img);
