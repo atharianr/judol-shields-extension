@@ -1,37 +1,14 @@
-// instantImageBlur()
+instantImageBlur()
 
 import Analyzer from './analyzer.js';
 import ObserverManager from './observer_manager.js';
 import OverlayManager from './overlay_manager.js';
 import Sanitizer from './sanitizer.js';
+import Utils from './Utils.js';
 
 console.log("[SCRIPT LOADED] CONTENT.JS");
 
-async function classifyImageElementViaBackground(element) {
-    const src = element.src;
-
-    return new Promise((resolve) => {
-        chrome.runtime.sendMessage({ type: "classifyImageUrl", payload: src }, (response) => {
-            if (chrome.runtime.lastError) {
-                console.error("[Content] Error sending message to background:", chrome.runtime.lastError);
-                resolve(null);
-            } else {
-                resolve(response);
-            }
-        });
-    });
-}
-
-function blurImage(imgElement) {
-    imgElement.style.filter = 'blur(16px)';
-    imgElement.style.transition = 'filter 0.3s ease';
-}
-
-function unblurImage(imgElement) {
-    imgElement.style.filter = '';
-}
-
-
+// Ensure script runs when DOM is ready
 function onReady(callback) {
     if (document.readyState === "complete" || document.readyState === "interactive") {
         callback();
@@ -40,8 +17,9 @@ function onReady(callback) {
     }
 }
 
+// Main initialization function
 function init() {
-    injectTailwind();
+    Utils.injectTailwind();
 
     chrome.storage.local.get(['featureEnabled'], (result) => {
         const isFeatureEnabled = result.featureEnabled ?? false;
@@ -56,51 +34,22 @@ function init() {
         const sanitizer = new Sanitizer();
         const overlayManager = new OverlayManager();
         const analyzer = new Analyzer(overlayManager);
-        const observerManager = new ObserverManager(sanitizer, classifyImageElementViaBackground);
-
+        const observerManager = new ObserverManager(sanitizer);
 
         sanitizer.loadFromCache(() => {
-            // Blur immediately after DOM is ready
             onReady(() => {
-                console.log("onReady")
-                const MIN_WIDTH = 50;
-                const MIN_HEIGHT = 50;
+                console.log("[Content] DOM ready, beginning sanitization.");
 
+                // Initial image blur & classification
                 const images = document.querySelectorAll('img');
-
                 images.forEach((img, i) => {
-                    if (img.naturalWidth < MIN_WIDTH || img.naturalHeight < MIN_HEIGHT) {
-                        return;
-                    }
-
-
-                    blurImage(img);  // Immediately blur the image
-
-                    const handleClassification = () => {
-                        classifyImageElementViaBackground(img).then(result => {
-                            if (result) {
-                                console.log(`🧠 [${i}] Prediction: ${result.label} (${(result.score * 100).toFixed(2)}%)`);
-
-                                if (result.label != 'judol') {
-                                    unblurImage(img);
-                                    console.log(`✅ [${i}] Image unblurred, safe content.`);
-                                }
-                            } else {
-                                // In case of error, unblur to avoid false positives
-                                unblurImage(img);
-                            }
-                        });
-                    };
-
-                    if (img.complete && img.naturalWidth !== 0) {
-                        handleClassification();
-                    } else {
-                        img.onload = handleClassification;
-                    }
+                    sanitizer.sanitizeImageNode(img, i);
                 });
 
+                // Sanitize text and future mutations
+                sanitizer.sanitizeAllTextNode(document.body);
 
-                sanitizer.sanitizeAll(document.body);
+                // Init mutation observer
                 observerManager.setup();
             });
         });
@@ -109,31 +58,26 @@ function init() {
     });
 }
 
-function injectTailwind() {
-    const waitHead = () => {
+function instantImageBlur() {
+    const inject = () => {
         if (document.head) {
-            if (!document.querySelector("#tailwind-injected")) {
-                const link = document.createElement("link");
-                link.id = "tailwind-injected";
-                link.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
-                link.rel = "stylesheet";
-                document.head.appendChild(link);
+            if (!document.getElementById('instant-blur-style')) {
+                const style = document.createElement('style');
+                style.id = 'instant-blur-style';
+                style.textContent = `
+                    img:not([data-judged]) {
+                        filter: blur(16px);
+                        transition: filter 0.3s ease;
+                    }
+                `;
+                document.head.appendChild(style);
             }
         } else {
-            requestAnimationFrame(waitHead);
+            requestAnimationFrame(inject); // try again on the next frame
         }
     };
-    waitHead();
-}
 
-// function instantImageBlur() {
-//     const style = document.createElement('style');
-//     style.textContent = `
-//         img {
-//             filter: blur(10px) !important;
-//         }
-//     `;
-//     document.documentElement.appendChild(style);
-// }
+    inject(); // start checking
+}
 
 init();

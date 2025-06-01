@@ -13,6 +13,21 @@ export default class Sanitizer {
         });
     }
 
+    async classifyImageElement(imgElement) {
+        const src = imgElement.src;
+        return new Promise((resolve) => {
+            chrome.runtime.sendMessage({ type: "classifyImageUrl", payload: src }, (response) => {
+                if (chrome.runtime.lastError) {
+                    console.error("[Sanitizer] Error classifying image:", chrome.runtime.lastError);
+                    resolve(null);
+                } else {
+                    resolve(response);
+                }
+            });
+        });
+    }
+
+
     sanitizeTextNode(node) {
         if (node.nodeType !== Node.TEXT_NODE || !node.parentElement ||
             Utils.isEditableElement(node.parentElement) ||
@@ -56,23 +71,65 @@ export default class Sanitizer {
         parent.removeChild(node);
     }
 
-
-    // sanitizeImages(root = document.body) {
-    //     const images = root.querySelectorAll('img');
-    //     images.forEach(img => {
-    //         img.style.filter = 'blur(10px)';
-    //         // img.style.transition = 'filter 0.3s ease';
-    //     });
-    // }
-
-
-    sanitizeAll(node) {
+    sanitizeAllTextNode(node) {
         if (node.nodeType === Node.ELEMENT_NODE && ["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"].includes(node.tagName)) return;
         if (node.nodeType === Node.TEXT_NODE) {
             this.sanitizeTextNode(node); // For Text
         } else {
-            // this.sanitizeImages(node); // For Image
-            node.childNodes.forEach(child => this.sanitizeAll(child));
+            node.childNodes.forEach(child => this.sanitizeAllTextNode(child));
         }
+    }
+
+    sanitizeImageNode(img, index = 0) {
+        if (img.naturalWidth < 50 || img.naturalHeight < 50 || img.dataset.blurred === "true") return;
+
+        img.style.filter = 'blur(16px)';
+        img.style.transition = 'filter 0.3s ease';
+        img.dataset.blurred = "true";
+
+        const classifyAndMaybeUnblur = () => {
+            this.classifyImageElement(img).then(result => {
+                if (result) {
+                    if (result.label !== 'judol') {
+                        this.markAsSafe(img);
+                    } else {
+                        this.markAsUnsafe(img);
+                    }
+                } else {
+                    this.markAsSafe(img); // fallback
+                }
+            });
+        };
+
+        if (img.complete && img.naturalWidth !== 0) {
+            classifyAndMaybeUnblur();
+        } else {
+            img.onload = classifyAndMaybeUnblur;
+        }
+    }
+
+    blurImageTemporarily(img) {
+        if (img.naturalWidth < 50 || img.naturalHeight < 50) return false;
+        if (img.dataset.blurred === "true") return false;
+
+        img.style.filter = 'blur(16px)';
+        img.style.transition = 'filter 0.3s ease';
+        img.dataset.blurred = "true"; // prevent duplicate processing
+        return true;
+    }
+
+    unblurImage(img) {
+        img.style.filter = '';
+        img.dataset.blurred = "false";
+    }
+
+    markAsSafe(imgElement) {
+        imgElement.setAttribute('data-judged', 'true');
+        imgElement.style.filter = ''; // remove blur
+    }
+
+    markAsUnsafe(imgElement) {
+        imgElement.setAttribute('data-judged', 'true');
+        imgElement.style.filter = 'blur(16px)';
     }
 }

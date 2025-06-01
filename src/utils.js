@@ -42,4 +42,21 @@ export default class Utils {
         const normalizedText = text.normalize("NFKC") ?? "";
         return normalizedText;
     }
+
+    static injectTailwind() {
+        const waitForHead = () => {
+            if (document.head) {
+                if (!document.querySelector("#tailwind-injected")) {
+                    const link = document.createElement("link");
+                    link.id = "tailwind-injected";
+                    link.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
+                    link.rel = "stylesheet";
+                    document.head.appendChild(link);
+                }
+            } else {
+                requestAnimationFrame(waitForHead);
+            }
+        };
+        waitForHead();
+    }
 }
