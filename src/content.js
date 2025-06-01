@@ -7,9 +7,6 @@ import Sanitizer from './sanitizer.js';
 
 console.log("[SCRIPT LOADED] CONTENT.JS");
 
-// 5 output labels as specified
-const LABELS = ["drawings", "hentai", "neutral", "porn", "sexy"];
-
 async function classifyImageElementViaBackground(element) {
     try {
         // Convert image element to base64
@@ -94,7 +91,7 @@ function init() {
                             if (result) {
                                 console.log(`🧠 [${i}] Prediction: ${result.label} (${(result.score * 100).toFixed(2)}%)`);
 
-                                if (['hentai', 'porn', 'sexy'].includes(result.label)) {
+                                if (result.label == 'judol') {
                                     // Keep blurred
                                     console.log(`🔒 [${i}] Image kept blurred due to label: ${result.label}`);
                                 } else {

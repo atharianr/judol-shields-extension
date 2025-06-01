@@ -6,7 +6,7 @@ console.log("[SCRIPT LOADED] BACKGROUND.JS");
 class BackgroundService {
     constructor() {
         this.API_BASE = "https://regex.bism.app/api/v1";
-        this.LABELS = ["drawings", "hentai", "neutral", "porn", "sexy"];
+        this.LABELS = ["judol", "non_judol"];
         this.model = null;
 
         this.init();
@@ -49,7 +49,7 @@ class BackgroundService {
     }
 
     async loadModel() {
-        const modelURL = chrome.runtime.getURL('model/nsfw/model.json');
+        const modelURL = chrome.runtime.getURL('model/gambling-classification/model.json');
         console.log('[Background] Loading TF model...');
         this.model = await tf.loadGraphModel(modelURL);
         console.log('[Background] Model loaded.');
