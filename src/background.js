@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Utils from './Utils';
 import * as tf from '@tensorflow/tfjs';
 
 console.log("[SCRIPT LOADED] BACKGROUND.JS");
@@ -35,6 +36,17 @@ class BackgroundService {
             });
         } catch (error) {
             console.error("❌ Error fetching regexes:", error);
+        }
+    }
+
+    async analyzeRegex(request) {
+        console.log("[analyzeRegex] Analyzing request:", JSON.stringify(request, null, 2));
+        try {
+            const response = await axios.post(`${this.API_BASE}/regex/analyze`, request);
+            return response.data?.data ?? null;
+        } catch (error) {
+            console.error("❌ Failed to analyze regex:", error.response);
+            return { error: true, message: error.message || 'Unknown error' };
         }
     }
 
@@ -82,19 +94,45 @@ class BackgroundService {
             });
         });
 
-        chrome.contextMenus.onClicked.addListener((info, tab) => {
+        chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             if (info.menuItemId === "judolshields_report_context") {
-                const selectedText = info.selectionText;
+                const selectedText = Utils.normalizeUnicode(info.selectionText);
+                
+                if (selectedText.length < 20) {
+                    chrome.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        func: (message) => {
+                            alert(message);
+                        },
+                        args: ["Ups! Teksnya masih terlalu pendek nih, coba pilih lebih dari 20 karakter yaa 😊"]
+                    });
+                    return;
+                } else if (selectedText.length > 900) {
+                    chrome.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        func: (message) => {
+                            alert(message);
+                        },
+                        args: ["Ups! Teksnya kepanjangan nih, pilih yang lebih singkat dulu yuk. Maksinal 900 karakter yaa 😊"]
+                    });
+                    return;
+                }
+
+                const request = { text: [selectedText] };
+                const result = await this.analyzeRegex(request);
+
+                console.log("[judolshields_report_context] result -> ", result);
 
                 chrome.scripting.executeScript({
                     target: { tabId: tab.id },
-                    func: (text) => {
-                        alert(`👍 Terima kasih! Kamu baru saja melaporkan:\n\n"${text}"\n\nke tim JudolShields.`);
+                    func: (message) => {
+                        alert(message);
                     },
-                    args: [selectedText]
+                    args: [result.message]
                 });
             }
         });
+
 
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             console.log("[onMessage] Received:", message.type);

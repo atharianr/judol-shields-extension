@@ -18,13 +18,14 @@ export default class Sanitizer {
             Utils.isEditableElement(node.parentElement) || Utils.isInsideEditable(node)) return;
 
         const parent = node.parentElement;
-        const text = node.textContent.normalize("NFKC");
+        const text = Utils.normalizeUnicode(node.textContent);
         let currentIndex = 0, replaced = false;
         const fragments = [];
 
         this.regexList.forEach(regex => {
             regex.lastIndex = 0;
             let match;
+
             while ((match = regex.exec(text)) !== null) {
                 const before = text.slice(currentIndex, match.index);
                 if (before) fragments.push(document.createTextNode(before));

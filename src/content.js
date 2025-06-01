@@ -63,6 +63,7 @@ function init() {
         sanitizer.loadFromCache(() => {
             // Blur immediately after DOM is ready
             onReady(() => {
+                console.log("onReady")
                 const MIN_WIDTH = 50;
                 const MIN_HEIGHT = 50;
 
