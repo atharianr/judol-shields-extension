@@ -7,7 +7,6 @@ console.log("[SCRIPT LOADED] BACKGROUND.JS");
 class BackgroundService {
     constructor() {
         this.API_BASE = "https://regex.bism.app/api/v1";
-        // this.LABELS = ["drawings", "hentai", "neutral", "porn", "sexy"];
         this.LABELS = ["judol", "non_judol"];
         this.model = null;
 
@@ -143,7 +142,7 @@ class BackgroundService {
                     console.log("[onMessage] Responding with:", result);
                     sendResponse(result);
                 })();
-                return true; // keep sendResponse channel open
+                return true;
             }
 
             // New message handler for image classification

@@ -29,10 +29,7 @@ export default class ObserverManager {
                     this.classifyImageElement(img).then(result => {
                         if (result) {
                             console.log(`🧠 [Prediction] ${result.label} (${(result.score * 100).toFixed(2)}%)`);
-                            // if (['hentai', 'porn', 'sexy'].includes(result.label)) {
-                            if (result.label == 'judol') {
-                                console.log(`🔒 Image kept blurred`);
-                            } else {
+                            if (result.label != 'judol') {
                                 img.style.filter = '';
                                 console.log(`✅ Image unblurred (safe)`);
                             }

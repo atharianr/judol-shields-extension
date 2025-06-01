@@ -56,7 +56,6 @@ function init() {
         const sanitizer = new Sanitizer();
         const overlayManager = new OverlayManager();
         const analyzer = new Analyzer(overlayManager);
-        // const observerManager = new ObserverManager(sanitizer);
         const observerManager = new ObserverManager(sanitizer, classifyImageElementViaBackground);
 
 
@@ -82,12 +81,7 @@ function init() {
                             if (result) {
                                 console.log(`🧠 [${i}] Prediction: ${result.label} (${(result.score * 100).toFixed(2)}%)`);
 
-                                // if (['hentai', 'porn', 'sexy'].includes(result.label)) {
-                                if (result.label == 'judol') {
-                                    // Keep blurred
-                                    // console.log(`🔒 [${i}] Image kept blurred due to label: ${result.label}`);
-                                } else {
-                                    // Safe, unblur it
+                                if (result.label != 'judol') {
                                     unblurImage(img);
                                     console.log(`✅ [${i}] Image unblurred, safe content.`);
                                 }
