@@ -15,7 +15,9 @@ export default class Sanitizer {
 
     sanitizeTextNode(node) {
         if (node.nodeType !== Node.TEXT_NODE || !node.parentElement ||
-            Utils.isEditableElement(node.parentElement) || Utils.isInsideEditable(node)) return;
+            Utils.isEditableElement(node.parentElement) ||
+            Utils.isInsideEditable(node) ||
+            node.parentElement.classList.contains("blurred-text")) return;
 
         const parent = node.parentElement;
         const text = Utils.normalizeUnicode(node.textContent);
@@ -32,6 +34,7 @@ export default class Sanitizer {
 
                 const span = document.createElement("span");
                 span.textContent = match[0];
+                span.classList.add("blurred-text");
                 Object.assign(span.style, {
                     filter: "blur(5px)",
                     backgroundColor: "#0001",
@@ -52,6 +55,7 @@ export default class Sanitizer {
         fragments.forEach(frag => parent.insertBefore(frag, node));
         parent.removeChild(node);
     }
+
 
     // sanitizeImages(root = document.body) {
     //     const images = root.querySelectorAll('img');
