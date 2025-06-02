@@ -10,14 +10,12 @@ export default class ObserverManager {
 
         const processImages = () => {
             const images = document.querySelectorAll('img');
-            console.log(`[ObserverManager] images size -> ${images.length}`)
             images.forEach(img => {
                 this.sanitizer.sanitizeImageNode(img);
             });
         };
 
         const observer = new MutationObserver(mutations => {
-            processImages();
 
             if (timeout) clearTimeout(timeout);
 
@@ -42,7 +40,7 @@ export default class ObserverManager {
                     }
                 });
 
-                // processImages(); // process images in the whole document
+                processImages(); // process images in the whole document
             }, 100);
         });
 
@@ -55,5 +53,10 @@ export default class ObserverManager {
         });
 
         console.log("[ObserverManager] Initialized");
+
+        setInterval(() => {
+            console.log("[ObserverManager] doing interval");
+            this.sanitizer.sanitizeAllTextNode(document.body);
+        }, 1500); // every 1.5 seconds
     }
 }
