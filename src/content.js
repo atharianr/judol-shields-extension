@@ -1,4 +1,4 @@
-instantImageBlur()
+// instantImageBlur()
 
 import Analyzer from './analyzer.js';
 import ObserverManager from './observer_manager.js';
@@ -58,26 +58,26 @@ function init() {
     });
 }
 
-function instantImageBlur() {
-    const inject = () => {
-        if (document.head) {
-            if (!document.getElementById('instant-blur-style')) {
-                const style = document.createElement('style');
-                style.id = 'instant-blur-style';
-                style.textContent = `
-                    img:not([data-judged]) {
-                        filter: blur(16px);
-                        transition: filter 0.3s ease;
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        } else {
-            requestAnimationFrame(inject); // try again on the next frame
-        }
-    };
+// function instantImageBlur() {
+//     const inject = () => {
+//         if (document.head) {
+//             if (!document.getElementById('instant-blur-style')) {
+//                 const style = document.createElement('style');
+//                 style.id = 'instant-blur-style';
+//                 style.textContent = `
+//                     img:not([data-judged]) {
+//                         filter: blur(16px);
+//                         transition: filter 0.3s ease;
+//                     }
+//                 `;
+//                 document.head.appendChild(style);
+//             }
+//         } else {
+//             requestAnimationFrame(inject); // try again on the next frame
+//         }
+//     };
 
-    inject(); // start checking
-}
+//     inject(); // start checking
+// }
 
 init();

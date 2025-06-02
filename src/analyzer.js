@@ -1,6 +1,5 @@
+import Constant from "./constant";
 import Utils from "./Utils";
-
-const WHITELISTED_DOMAINS = ["google.com", "youtube.com", "localhost", "atharianr.dev"];
 
 export default class Analyzer {
     constructor(overlayManager) {
@@ -12,7 +11,7 @@ export default class Analyzer {
         const fullUrl = window.location.href;
 
         if (window.location.protocol.includes("extension:") ||
-            WHITELISTED_DOMAINS.some(allowed => domain.endsWith(allowed))) return;
+            Constant.WHITELISTED_DOMAINS.some(allowed => domain.endsWith(allowed))) return;
 
         const cleaned = Utils.cleanHtml(document.head.innerHTML);
         this.overlayManager.show();

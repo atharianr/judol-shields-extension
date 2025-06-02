@@ -1,13 +1,12 @@
 import axios from 'axios';
 import Utils from './Utils';
 import * as tf from '@tensorflow/tfjs';
+import Constant from './constant';
 
 console.log("[SCRIPT LOADED] BACKGROUND.JS");
 
 class BackgroundService {
     constructor() {
-        this.API_BASE = "https://regex.bism.app/api/v1";
-        this.LABELS = ["judol", "non_judol"];
         this.model = null;
 
         this.init();
@@ -23,7 +22,7 @@ class BackgroundService {
     async fetchAndCacheRegexes() {
         console.log("[fetchAndCacheRegexes] Requesting regex list...");
         try {
-            const response = await axios.get(`${this.API_BASE}/regex`);
+            const response = await axios.get(`${Constant.API_BASE}/regex`);
             const regexList = response.data?.data?.regexList ?? [];
 
             const validRegexes = regexList
@@ -41,7 +40,7 @@ class BackgroundService {
     async analyzeRegex(request) {
         console.log("[analyzeRegex] Analyzing request:", JSON.stringify(request, null, 2));
         try {
-            const response = await axios.post(`${this.API_BASE}/regex/analyze`, request);
+            const response = await axios.post(`${Constant.API_BASE}/regex/analyze`, request);
             return response.data?.data ?? null;
         } catch (error) {
             console.error("❌ Failed to analyze regex:", error.response);
@@ -52,7 +51,7 @@ class BackgroundService {
     async analyzeWebsite(request) {
         console.log("[analyzeWebsite] Analyzing request:", JSON.stringify(request, null, 2));
         try {
-            const response = await axios.post(`${this.API_BASE}/analyze`, request);
+            const response = await axios.post(`${Constant.API_BASE}/analyze`, request);
             return response.data?.data ?? null;
         } catch (error) {
             console.error("❌ Failed to analyze website:", error.response);
@@ -61,7 +60,7 @@ class BackgroundService {
     }
 
     async loadModel() {
-        const modelURL = chrome.runtime.getURL('model/gambling-classification/model.json');
+        const modelURL = chrome.runtime.getURL(Constant.MODEL_PATH);
         console.log('[Background] Loading TF model...');
         this.model = await tf.loadGraphModel(modelURL);
         console.log('[Background] Model loaded.');
@@ -73,7 +72,7 @@ class BackgroundService {
         const data = await prediction.data();
 
         const results = Array.from(data).map((score, idx) => ({
-            label: this.LABELS[idx],
+            label: Constant.MODEL_LABELS[idx],
             score,
         }));
 
@@ -86,17 +85,17 @@ class BackgroundService {
     setupMessageListener() {
         chrome.runtime.onInstalled.addListener(() => {
             chrome.contextMenus.create({
-                id: "judolshields_report_context",
+                id: Constant.CONTEXT_MENU_ID,
                 title: "Laporkan teks ini ke JudolShields",
                 contexts: ["selection"],
             });
         });
 
         chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-            if (info.menuItemId === "judolshields_report_context") {
+            if (info.menuItemId === Constant.CONTEXT_MENU_ID) {
                 const selectedText = Utils.normalizeUnicode(info.selectionText);
                 
-                if (selectedText.length < 20) {
+                if (selectedText.length < Constant.MIN_SELECTION_LENGTH) {
                     chrome.scripting.executeScript({
                         target: { tabId: tab.id },
                         func: (message) => {
@@ -105,7 +104,7 @@ class BackgroundService {
                         args: ["Ups! Teksnya masih terlalu pendek nih, coba pilih lebih dari 20 karakter yaa 😊"]
                     });
                     return;
-                } else if (selectedText.length > 900) {
+                } else if (selectedText.length > Constant.MAX_SELECTION_LENGTH) {
                     chrome.scripting.executeScript({
                         target: { tabId: tab.id },
                         func: (message) => {
@@ -118,8 +117,6 @@ class BackgroundService {
 
                 const request = { text: [selectedText] };
                 const result = await this.analyzeRegex(request);
-
-                console.log("[judolshields_report_context] result -> ", result);
 
                 chrome.scripting.executeScript({
                     target: { tabId: tab.id },
