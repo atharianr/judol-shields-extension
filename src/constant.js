@@ -2,7 +2,7 @@ const Constant = {
     API_BASE: "https://regex.bism.app/api/v1",
 
     MODEL_LABELS: ["judol", "non_judol"],
-    MODEL_PATH: "model/gambling-classification/model.json",
+    MODEL_PATH: "model/gambling-v2/model.json",
 
     WHITELISTED_DOMAINS: ["google.com", "youtube.com", "localhost", "atharianr.dev"],
 
