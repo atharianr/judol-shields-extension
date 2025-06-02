@@ -12,6 +12,8 @@ class BackgroundService {
         this.init();
         this.setupMessageListener();
         this.loadModel();
+
+        this.count = 0
     }
 
     async init() {
@@ -30,7 +32,7 @@ class BackgroundService {
                 .filter(pattern => typeof pattern === 'string' && pattern.trim());
 
             chrome.storage.local.set({ regexList: validRegexes }, () => {
-                console.log("✅ Regexes cached successfully:", validRegexes);
+                // console.log("✅ Regexes cached successfully:", validRegexes);
             });
         } catch (error) {
             console.error("❌ Error fetching regexes:", error);
@@ -145,7 +147,12 @@ class BackgroundService {
             if (message.type === "classifyImageUrl") {
                 (async () => {
                     try {
-                        const response = await fetch(message.payload, { mode: 'cors' });
+                        this.count++
+                        console.log(`[Background] count -> ${this.count}`)
+
+                        const src = message.payload
+                        console.log(`src ${src}`)
+                        const response = await fetch(src, { mode: 'cors' });
                         const blob = await response.blob();
                         const bitmap = await createImageBitmap(blob);
 

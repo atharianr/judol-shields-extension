@@ -1,3 +1,4 @@
+import Constant from "./constant";
 import Utils from "./Utils";
 
 export default class Sanitizer {
@@ -8,7 +9,7 @@ export default class Sanitizer {
     loadFromCache(callback) {
         chrome.storage.local.get("regexList", ({ regexList }) => {
             this.regexList = (regexList || []).map(p => new RegExp(p, "gi"));
-            console.log("✅ Loaded regexes from storage:", this.regexList);
+            // console.log("✅ Loaded regexes from storage:", this.regexList);
             callback();
         });
     }
@@ -81,11 +82,12 @@ export default class Sanitizer {
     }
 
     sanitizeImageNode(img, index = 0) {
-        if (img.naturalWidth < 50 || img.naturalHeight < 50 || img.dataset.blurred === "true") return;
+        if (img.naturalWidth < Constant.MAX_WIDTH || img.naturalHeight < Constant.MAX_HEIGTH || img.dataset.alreadyProcessed !== undefined) return;
 
-        img.style.filter = 'blur(16px)';
-        img.style.transition = 'filter 0.3s ease';
-        img.dataset.blurred = "true";
+        img.style.visibility = 'hidden'
+        // img.style.filter = 'blur(16px)';
+        // img.style.transition = 'filter 0.3s ease';
+        // img.dataset.blurred = "true";
 
         const classifyAndMaybeUnblur = () => {
             this.classifyImageElement(img).then(result => {
@@ -98,29 +100,18 @@ export default class Sanitizer {
                 } else {
                     this.markAsSafe(img); // fallback
                 }
+                img.dataset.alreadyProcessed = "true"
+                img.style.visibility = 'visible'
             });
         };
+
+        console.log(`[Sanitizer] img.complete -> ${img.complete}`)
 
         if (img.complete && img.naturalWidth !== 0) {
             classifyAndMaybeUnblur();
         } else {
             img.onload = classifyAndMaybeUnblur;
         }
-    }
-
-    blurImageTemporarily(img) {
-        if (img.naturalWidth < 50 || img.naturalHeight < 50) return false;
-        if (img.dataset.blurred === "true") return false;
-
-        img.style.filter = 'blur(16px)';
-        img.style.transition = 'filter 0.3s ease';
-        img.dataset.blurred = "true"; // prevent duplicate processing
-        return true;
-    }
-
-    unblurImage(img) {
-        img.style.filter = '';
-        img.dataset.blurred = "false";
     }
 
     markAsSafe(imgElement) {

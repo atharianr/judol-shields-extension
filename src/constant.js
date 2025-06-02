@@ -18,6 +18,9 @@ const Constant = {
 
     MIN_SELECTION_LENGTH: 20,
     MAX_SELECTION_LENGTH: 900,
+
+    MAX_WIDTH: 41,
+    MAX_HEIGTH: 41,
 };
 
 export default Constant;

@@ -3,7 +3,6 @@ import Utils from "./Utils";
 export default class ObserverManager {
     constructor(sanitizer) {
         this.sanitizer = sanitizer;
-        this.classifiedImages = new WeakSet(); // prevents duplicate processing
     }
 
     setup() {
@@ -11,14 +10,15 @@ export default class ObserverManager {
 
         const processImages = () => {
             const images = document.querySelectorAll('img');
+            console.log(`[ObserverManager] images size -> ${images.length}`)
             images.forEach(img => {
-                if (this.classifiedImages.has(img)) return;
-                this.classifiedImages.add(img);
                 this.sanitizer.sanitizeImageNode(img);
             });
         };
 
         const observer = new MutationObserver(mutations => {
+            processImages();
+
             if (timeout) clearTimeout(timeout);
 
             timeout = setTimeout(() => {
@@ -42,7 +42,7 @@ export default class ObserverManager {
                     }
                 });
 
-                processImages(); // process images in the whole document
+                // processImages(); // process images in the whole document
             }, 100);
         });
 

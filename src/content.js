@@ -40,12 +40,6 @@ function init() {
             onReady(() => {
                 console.log("[Content] DOM ready, beginning sanitization.");
 
-                // Initial image blur & classification
-                const images = document.querySelectorAll('img');
-                images.forEach((img, i) => {
-                    sanitizer.sanitizeImageNode(img, i);
-                });
-
                 // Sanitize text and future mutations
                 sanitizer.sanitizeAllTextNode(document.body);
 
