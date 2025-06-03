@@ -12,18 +12,7 @@ export default class ObserverManager {
             const images = document.querySelectorAll('img');
             images.forEach(img => {
                 const src = img.src;
-                
-                // Disable detecting on extension
-                if (
-                    src.startsWith('chrome://') ||
-                    src.startsWith('chrome-extension://') ||
-                    src.startsWith('moz-extension://') ||
-                    src.startsWith('edge://') ||
-                    src.startsWith('edge-extension://')
-                ) {
-                    return;
-                }
-
+                if (Utils.shouldSkipImage?.(src)) return;
                 this.sanitizer.sanitizeImageNode(img);
             });
         };

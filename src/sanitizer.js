@@ -66,10 +66,10 @@ export default class Sanitizer {
                 const anchor = container.closest("a");
                 if (anchor) {
                     anchor.style.pointerEvents = "none";
-                    anchor.style.cursor = "default";      
-                    anchor.removeAttribute("href");       
-                    anchor.removeAttribute("target");     
-                    anchor.removeAttribute("rel");        
+                    anchor.style.cursor = "default";
+                    anchor.removeAttribute("href");
+                    anchor.removeAttribute("target");
+                    anchor.removeAttribute("rel");
                     anchor.setAttribute("tabindex", "-1");
                     anchor.setAttribute("aria-disabled", "true");
                 }
@@ -103,9 +103,14 @@ export default class Sanitizer {
 
 
     sanitizeImageNode(img, index = 0) {
-        if (img.naturalWidth < Constant.MAX_WIDTH || img.naturalHeight < Constant.MAX_HEIGTH || img.dataset.alreadyProcessed !== undefined) return;
+        // Immediately hide the image (no delay)
+        this.hideImage(img)
 
-        img.style.visibility = 'hidden'
+        if (img.naturalWidth < Constant.MAX_WIDTH || img.naturalHeight < Constant.MAX_HEIGTH || img.dataset.alreadyProcessed !== undefined) {
+            // If skipping, make it visible again
+            this.showImage(img)
+            return;
+        }
 
         const classifyAndMaybeUnblur = () => {
             this.classifyImageElement(img).then(result => {
@@ -115,11 +120,12 @@ export default class Sanitizer {
                     } else {
                         this.markAsUnsafe(img);
                     }
+                    img.dataset.alreadyProcessed = "true";
+                    this.showImage(img)
                 } else {
                     this.markAsSafe(img);
+                    this.showImage(img)
                 }
-                img.dataset.alreadyProcessed = "true"
-                img.style.visibility = 'visible'
             });
         };
 
@@ -138,5 +144,15 @@ export default class Sanitizer {
     markAsUnsafe(imgElement) {
         imgElement.setAttribute('data-judged', 'true');
         imgElement.style.filter = 'blur(16px)';
+    }
+
+    hideImage(imgElement) {
+        if (imgElement.parentNode?.nodeName === 'BODY') imgElement.hidden = true
+        imgElement.style.visibility = 'hidden'
+    }
+
+    showImage(imgElement) {
+        if (imgElement.parentNode?.nodeName === 'BODY') imgElement.hidden = false
+        imgElement.style.visibility = 'visible'
     }
 }

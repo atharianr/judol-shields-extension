@@ -59,4 +59,12 @@ export default class Utils {
         };
         waitForHead();
     }
+
+    static shouldSkipImage(src) {
+        return src.startsWith('chrome://') ||
+            src.startsWith('chrome-extension://') ||
+            src.startsWith('moz-extension://') ||
+            src.startsWith('edge://') ||
+            src.startsWith('edge-extension://');
+    }
 }

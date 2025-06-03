@@ -5,7 +5,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "dev": "npm run clean && concurrently \"node reload-server.js\" \"webpack --watch --config webpack.dev.js\"",
-    "build": "webpack --config webpack.prod.js"
+    "build": "npm run clean && webpack --config webpack.prod.js"
   },
   "keywords": [],
   "author": "",

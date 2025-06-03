@@ -1,4 +1,4 @@
-import './reload.js';
+if (process.env.NODE_ENV === 'development') require('./reload.js');
 import axios from 'axios';
 import Utils from './Utils';
 import * as tf from '@tensorflow/tfjs';
@@ -97,7 +97,6 @@ class BackgroundService {
         chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             if (info.menuItemId === Constant.CONTEXT_MENU_ID) {
                 const selectedText = Utils.normalizeUnicode(info.selectionText);
-                
                 if (selectedText.length < Constant.MIN_SELECTION_LENGTH) {
                     chrome.scripting.executeScript({
                         target: { tabId: tab.id },

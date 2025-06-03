@@ -7,6 +7,8 @@ export default class Analyzer {
     }
 
     analyze() {
+        Utils.injectTailwind();
+
         const domain = window.location.hostname;
         const fullUrl = window.location.href;
 
