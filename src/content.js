@@ -18,11 +18,6 @@ function onReady(callback) {
 
 // Main initialization function
 function init() {
-    const sanitizer = new Sanitizer();
-    const overlayManager = new OverlayManager();
-    const analyzer = new Analyzer(overlayManager);
-    const observerManager = new ObserverManager(sanitizer);
-
     chrome.storage.local.get(['featureEnabled'], (result) => {
         const isFeatureEnabled = result.featureEnabled ?? false;
 
@@ -33,14 +28,10 @@ function init() {
 
         console.log("[Feature Enabled] Running content script.");
 
-        requestIdleCallback(() => {
-            processImages(sanitizer)
-            observerManager.setup();
-        });
-
-        onReady(() => {
-            processImages(sanitizer)
-        });
+        const sanitizer = new Sanitizer();
+        const overlayManager = new OverlayManager();
+        const analyzer = new Analyzer(overlayManager);
+        const observerManager = new ObserverManager(sanitizer);
 
         sanitizer.loadFromCache(() => {
             onReady(() => {
@@ -48,19 +39,13 @@ function init() {
 
                 // Sanitize text and future mutations
                 sanitizer.sanitizeAllTextNode(document.body);
+
+                // Init mutation observer
+                observerManager.setup();
             });
         });
 
         analyzer.analyze();
-    });
-}
-
-function processImages(sanitizer) {
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-        const src = img.src;
-        if (Utils.shouldSkipImage?.(src)) return;
-        sanitizer.sanitizeImageNode(img);
     });
 }
 

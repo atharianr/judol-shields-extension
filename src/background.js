@@ -33,7 +33,7 @@ class BackgroundService {
                 .filter(pattern => typeof pattern === 'string' && pattern.trim());
 
             chrome.storage.local.set({ regexList: validRegexes }, () => {
-                // console.log("✅ Regexes cached successfully:", validRegexes);
+                console.log("✅ Regexes cached successfully:", validRegexes);
             });
         } catch (error) {
             console.error("❌ Error fetching regexes:", error);
