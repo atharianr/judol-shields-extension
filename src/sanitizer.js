@@ -31,50 +31,54 @@ export default class Sanitizer {
     sanitizeTextNode(node) {
         if (node.nodeType !== Node.TEXT_NODE || !node.parentElement) return;
 
+        // Find closest container to blur (span, div, p, h1-h6)
+        const container = node.parentElement.closest("span, div, p, h1, h2, h3, h4, h5, h6");
+        if (!container) return;
+
+        // Skip if already blurred or editable
         if (
-            Utils.isEditableElement(node.parentElement) ||
-            Utils.isInsideEditable(node) ||
-            node.parentElement.classList.contains("blurred-text")
+            Utils.isEditableElement(container) ||
+            Utils.isInsideEditable(container) ||
+            container.classList.contains("blurred-text-container") ||
+            container.closest(".blurred-text-container")
         ) return;
 
-        const text = Utils.normalizeUnicode(node.textContent || '');
-        if (!text.trim()) return;
+        // Skip containers with images/videos/etc
+        if (container.querySelector("img, video, iframe, svg, canvas, picture, object, embed")) return;
 
-        let currentIndex = 0;
-        let replaced = false;
-        const fragments = [];
+        const fullText = Utils.normalizeUnicode(container.innerText || '');
+        if (!fullText.trim()) return;
 
-        this.regexList.forEach(regex => {
+        for (const regex of this.regexList) {
             regex.lastIndex = 0;
-            let match;
-            while ((match = regex.exec(text)) !== null) {
-                const before = text.slice(currentIndex, match.index);
-                if (before) fragments.push(document.createTextNode(before));
-
-                const span = document.createElement("span");
-                span.textContent = match[0];
-                span.classList.add("blurred-text");
-                Object.assign(span.style, {
+            if (regex.test(fullText)) {
+                // Blur the container
+                container.classList.add("blurred-text-container");
+                Object.assign(container.style, {
                     filter: "blur(5px)",
-                    backgroundColor: "#0001",
-                    borderRadius: "4px"
+                    backgroundColor: "rgba(0, 0, 0, 0.067)",
+                    borderRadius: "4px",
+                    padding: "2px",
+                    pointerEvents: "auto" // enable event processing in blurred container
                 });
-                fragments.push(span);
 
-                currentIndex = match.index + match[0].length;
-                replaced = true;
+                // Find closest <a> ancestor and disable its link behavior
+                const anchor = container.closest("a");
+                if (anchor) {
+                    anchor.style.pointerEvents = "none";
+                    anchor.style.cursor = "default";      
+                    anchor.removeAttribute("href");       
+                    anchor.removeAttribute("target");     
+                    anchor.removeAttribute("rel");        
+                    anchor.setAttribute("tabindex", "-1");
+                    anchor.setAttribute("aria-disabled", "true");
+                }
+
+                break;
             }
-        });
-
-        if (!replaced) return;
-
-        const after = text.slice(currentIndex);
-        if (after) fragments.push(document.createTextNode(after));
-
-        const parent = node.parentElement;
-        fragments.forEach(frag => parent.insertBefore(frag, node));
-        parent.removeChild(node);
+        }
     }
+
 
     sanitizeAllTextNode(node) {
         if (!node) return;
@@ -102,9 +106,6 @@ export default class Sanitizer {
         if (img.naturalWidth < Constant.MAX_WIDTH || img.naturalHeight < Constant.MAX_HEIGTH || img.dataset.alreadyProcessed !== undefined) return;
 
         img.style.visibility = 'hidden'
-        // img.style.filter = 'blur(16px)';
-        // img.style.transition = 'filter 0.3s ease';
-        // img.dataset.blurred = "true";
 
         const classifyAndMaybeUnblur = () => {
             this.classifyImageElement(img).then(result => {
@@ -115,14 +116,12 @@ export default class Sanitizer {
                         this.markAsUnsafe(img);
                     }
                 } else {
-                    this.markAsSafe(img); // fallback
+                    this.markAsSafe(img);
                 }
                 img.dataset.alreadyProcessed = "true"
                 img.style.visibility = 'visible'
             });
         };
-
-        // console.log(`[Sanitizer] img.complete -> ${img.complete}`)
 
         if (img.complete && img.naturalWidth !== 0) {
             classifyAndMaybeUnblur();
@@ -133,7 +132,7 @@ export default class Sanitizer {
 
     markAsSafe(imgElement) {
         imgElement.setAttribute('data-judged', 'true');
-        imgElement.style.filter = ''; // remove blur
+        imgElement.style.filter = '';
     }
 
     markAsUnsafe(imgElement) {

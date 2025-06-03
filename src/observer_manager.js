@@ -11,9 +11,23 @@ export default class ObserverManager {
         const processImages = () => {
             const images = document.querySelectorAll('img');
             images.forEach(img => {
+                const src = img.src;
+                
+                // Disable detecting on extension
+                if (
+                    src.startsWith('chrome://') ||
+                    src.startsWith('chrome-extension://') ||
+                    src.startsWith('moz-extension://') ||
+                    src.startsWith('edge://') ||
+                    src.startsWith('edge-extension://')
+                ) {
+                    return;
+                }
+
                 this.sanitizer.sanitizeImageNode(img);
             });
         };
+
 
         const observer = new MutationObserver(mutations => {
 
@@ -54,9 +68,10 @@ export default class ObserverManager {
 
         console.log("[ObserverManager] Initialized");
 
+        // For website that have delayed DOM (custom DOM like YouTube)
         setInterval(() => {
             console.log("[ObserverManager] doing interval");
             this.sanitizer.sanitizeAllTextNode(document.body);
-        }, 1500); // every 1.5 seconds
+        }, 1500);
     }
 }

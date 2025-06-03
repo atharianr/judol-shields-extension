@@ -1,3 +1,4 @@
+import './reload.js';
 import axios from 'axios';
 import Utils from './Utils';
 import * as tf from '@tensorflow/tfjs';
