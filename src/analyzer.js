@@ -7,13 +7,13 @@ export default class Analyzer {
     }
 
     analyze() {
-        Utils.injectTailwind();
-
         const domain = window.location.hostname;
         const fullUrl = window.location.href;
 
         if (window.location.protocol.includes("extension:") ||
             Constant.WHITELISTED_DOMAINS.some(allowed => domain.endsWith(allowed))) return;
+
+        Utils.injectTailwind();
 
         const cleaned = Utils.cleanHtml(document.head.innerHTML);
         this.overlayManager.show();

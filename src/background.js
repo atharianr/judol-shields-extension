@@ -13,8 +13,6 @@ class BackgroundService {
         this.init();
         this.setupMessageListener();
         this.loadModel();
-
-        this.count = 0
     }
 
     async init() {
@@ -147,11 +145,7 @@ class BackgroundService {
             if (message.type === "classifyImageUrl") {
                 (async () => {
                     try {
-                        this.count++
-                        console.log(`[Background] count -> ${this.count}`)
-
                         const src = message.payload
-                        console.log(`src ${src}`)
                         const response = await fetch(src, { mode: 'cors' });
                         const blob = await response.blob();
                         const bitmap = await createImageBitmap(blob);
@@ -168,6 +162,8 @@ class BackgroundService {
 
                         const result = await this.classifyImageTensor(tensor);
                         tensor.dispose();
+
+                        console.log(`[Background] result.label -> ${result.label}: ${src}`)
 
                         sendResponse(result);
                     } catch (err) {
