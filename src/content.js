@@ -24,7 +24,7 @@ function init() {
     const observerManager = new ObserverManager(sanitizer);
 
     chrome.storage.local.get(['featureEnabled'], (result) => {
-        const isFeatureEnabled = result.featureEnabled ?? false;
+        const isFeatureEnabled = result.featureEnabled ?? true;
 
         if (!isFeatureEnabled) {
             console.log("[Feature Disabled] Skipping content script execution.");

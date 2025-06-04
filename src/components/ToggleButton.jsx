@@ -5,7 +5,7 @@ export default function ToggleButton({ className = '' }) {
 
     const handleClick = (event) => {
         chrome.storage.local.get(['featureEnabled'], (result) => {
-            const isFeatureEnabled = result.featureEnabled ?? false;
+            const isFeatureEnabled = result.featureEnabled ?? true;
             chrome.storage.local.set({ featureEnabled: !isFeatureEnabled }, () => {
                 console.log("Set featureEnabled -> ", !isFeatureEnabled);
                 setIsActive(!isFeatureEnabled)
@@ -24,7 +24,7 @@ export default function ToggleButton({ className = '' }) {
 
     const getFeatureEnabled = () => {
         chrome.storage.local.get(['featureEnabled'], (result) => {
-            const isFeatureEnabled = result.featureEnabled ?? false;
+            const isFeatureEnabled = result.featureEnabled ?? true;
             setIsActive(isFeatureEnabled)
         })
     }
