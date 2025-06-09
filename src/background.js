@@ -34,7 +34,7 @@ class BackgroundService {
                 console.log("✅ Regexes cached successfully:", validRegexes);
             });
         } catch (error) {
-            console.error("❌ Error fetching regexes:", error);
+            console.warn("❌ Error fetching regexes:", error);
         }
     }
 
@@ -44,7 +44,7 @@ class BackgroundService {
             const response = await axios.post(`${Constant.API_BASE}/regex/analyze`, request);
             return response.data?.data ?? null;
         } catch (error) {
-            console.error("❌ Failed to analyze regex:", error.response);
+            console.warn("❌ Failed to analyze regex:", error.response);
             return { error: true, message: error.message || 'Unknown error' };
         }
     }
@@ -55,7 +55,7 @@ class BackgroundService {
             const response = await axios.post(`${Constant.API_BASE}/analyze`, request);
             return response.data?.data ?? null;
         } catch (error) {
-            console.error("❌ Failed to analyze website:", error.response);
+            console.warn("❌ Failed to analyze website:", error.response);
             return { error: true, message: error.message || 'Unknown error' };
         }
     }
@@ -167,7 +167,7 @@ class BackgroundService {
 
                         sendResponse(result);
                     } catch (err) {
-                        console.error("[onMessage] classifyImageUrl error:", err);
+                        console.warn("[onMessage] classifyImageUrl error:", err?.message, err?.name, err?.stack);
                         sendResponse(null);
                     }
                 })();

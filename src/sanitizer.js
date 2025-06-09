@@ -19,7 +19,7 @@ export default class Sanitizer {
         return new Promise((resolve) => {
             chrome.runtime.sendMessage({ type: "classifyImageUrl", payload: src }, (response) => {
                 if (chrome.runtime.lastError) {
-                    console.error("[Sanitizer] Error classifying image:", chrome.runtime.lastError);
+                    console.warn("[Sanitizer] Error classifying image:", chrome.runtime.lastError);
                     resolve(null);
                 } else {
                     resolve(response);
