@@ -18,12 +18,10 @@ export default class Analyzer {
         const cleaned = Utils.cleanHtml(document.head.innerHTML);
         this.overlayManager.show();
 
-        console.log("[analyzeWebsite]")
         chrome.runtime.sendMessage({
             type: "analyzeWebsite",
             payload: { domain: fullUrl, header: cleaned }
         }, response => {
-            console.log("[analyzeWebsite]", response);
             if (!response?.is_judol) {
                 this.overlayManager.hide();
             } else {

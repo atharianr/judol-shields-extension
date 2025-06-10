@@ -5,7 +5,7 @@ import OverlayManager from './overlay_manager.js';
 import Sanitizer from './sanitizer.js';
 import Utils from './Utils.js';
 
-console.log("[SCRIPT LOADED] CONTENT.JS");
+console.log("[SCRIPT LOADED] CONTENT");
 
 // Ensure script runs when DOM is ready
 function onReady(callback) {
@@ -27,11 +27,11 @@ function init() {
         const isFeatureEnabled = result.featureEnabled ?? true;
 
         if (!isFeatureEnabled) {
-            console.log("[Feature Disabled] Skipping content script execution.");
+            console.log("[Content] Skipping content script execution.");
             return;
         }
 
-        console.log("[Feature Enabled] Running content script.");
+        console.log("[Content] Running content script.");
 
         requestIdleCallback(() => {
             processImages(sanitizer)

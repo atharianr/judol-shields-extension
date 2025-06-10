@@ -9,7 +9,6 @@ export default class Sanitizer {
     loadFromCache(callback) {
         chrome.storage.local.get("regexList", ({ regexList }) => {
             this.regexList = (regexList || []).map(p => new RegExp(p, "gi"));
-            // console.log("✅ Loaded regexes from storage:", this.regexList);
             callback();
         });
     }

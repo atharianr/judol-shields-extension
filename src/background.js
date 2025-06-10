@@ -4,7 +4,7 @@ import Utils from './Utils';
 import * as tf from '@tensorflow/tfjs';
 import Constant from './constant';
 
-console.log("[SCRIPT LOADED] BACKGROUND.JS");
+console.log("[SCRIPT LOADED] BACKGROUND");
 
 class BackgroundService {
     constructor() {
@@ -16,12 +16,11 @@ class BackgroundService {
     }
 
     async init() {
-        console.log("[init]");
         await this.fetchAndCacheRegexes();
     }
 
     async fetchAndCacheRegexes() {
-        console.log("[fetchAndCacheRegexes] Requesting regex list...");
+        console.log("[Background] Requesting regex list...");
         try {
             const response = await axios.get(`${Constant.API_BASE}/regex`);
             const regexList = response.data?.data?.regexList ?? [];
@@ -30,32 +29,28 @@ class BackgroundService {
                 .map(item => item.regex)
                 .filter(pattern => typeof pattern === 'string' && pattern.trim());
 
-            chrome.storage.local.set({ regexList: validRegexes }, () => {
-                console.log("✅ Regexes cached successfully:", validRegexes);
-            });
+            chrome.storage.local.set({ regexList: validRegexes });
         } catch (error) {
-            console.warn("❌ Error fetching regexes:", error);
+            console.warn("[Background] ❌ Error fetching regexes:", error);
         }
     }
 
     async analyzeRegex(request) {
-        console.log("[analyzeRegex] Analyzing request:", JSON.stringify(request, null, 2));
         try {
             const response = await axios.post(`${Constant.API_BASE}/regex/analyze`, request);
             return response.data?.data ?? null;
         } catch (error) {
-            console.warn("❌ Failed to analyze regex:", error.response);
+            console.warn("[Background] ❌ Failed to analyze regex:", error.response);
             return { error: true, message: error.message || 'Unknown error' };
         }
     }
 
     async analyzeWebsite(request) {
-        console.log("[analyzeWebsite] Analyzing request:", JSON.stringify(request, null, 2));
         try {
             const response = await axios.post(`${Constant.API_BASE}/analyze`, request);
             return response.data?.data ?? null;
         } catch (error) {
-            console.warn("❌ Failed to analyze website:", error.response);
+            console.warn("[Background] ❌ Failed to analyze website:", error.response);
             return { error: true, message: error.message || 'Unknown error' };
         }
     }
@@ -130,12 +125,9 @@ class BackgroundService {
 
 
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-            console.log("[onMessage] Received:", message.type);
-
             if (message.type === "analyzeWebsite") {
                 (async () => {
                     const result = await this.analyzeWebsite(message.payload);
-                    console.log("[onMessage] Responding with:", result);
                     sendResponse(result);
                 })();
                 return true;
@@ -163,11 +155,9 @@ class BackgroundService {
                         const result = await this.classifyImageTensor(tensor);
                         tensor.dispose();
 
-                        console.log(`[Background] result.label -> ${result.label}: ${src}`)
-
                         sendResponse(result);
                     } catch (err) {
-                        console.warn("[onMessage] classifyImageUrl error:", err?.message, err?.name, err?.stack);
+                        console.warn("[Background] classifyImageUrl error:", err?.message, err?.name, err?.stack);
                         sendResponse(null);
                     }
                 })();

@@ -55,11 +55,8 @@ export default class ObserverManager {
             attributeFilter: ['src']
         });
 
-        console.log("[ObserverManager] Initialized");
-
         // For website that have delayed DOM (custom DOM like YouTube)
         setInterval(() => {
-            console.log("[ObserverManager] doing interval");
             this.sanitizer.sanitizeAllTextNode(document.body);
         }, 1500);
     }
