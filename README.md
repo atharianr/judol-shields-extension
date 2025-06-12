@@ -1,5 +1,14 @@
-# JudolShields #SayNoToJudol
-[![top-language][img-shield-languange]][JavaScript]
+# JudolShields
+
+![JudolShieldLogoText1080](https://github.com/user-attachments/assets/88893f88-25a2-4e68-a1d9-e7463106cd20)
+
+## Table of Contents
+- [Overview](#overview)
+- [Requirements](#requirements)
+- [Project Installation](#project-installation)
+- [Build The Project](#build-the-project)
+- [Load Extension](#load-extension)
+- [Together We Fight Judol](#together-we-fight-judol)
 
 ## Overview
 JudolShields is a Chromium-based browser extension designed to protect Indonesian users from harmful online gambling ("judol") content. It proactively detects and blurs suspicious text and images, blocks dangerous links, and prevents access to gambling-related sites.
@@ -17,7 +26,7 @@ JudolShields helps reclaim digital wellbeing—one user at a time.
 [![Watch on YouTube](https://img.youtube.com/vi/XQWBu7YPZxs/0.jpg)](https://www.youtube.com/watch?v=XQWBu7YPZxs)
 
 ## Requirements
-- Code Editor ([Visual Studio Code] prefferable)
+- Code Editor ([Visual Studio Code] preferable)
 
 ## Project Installation
 1. Clone the repository
@@ -41,14 +50,14 @@ npm run build
 ```
 
 ## Load Extension
-### The easiest way to install the extension is directly from the Microsoft Edge Add-ons Store. Follow these steps:
+### Install via Microsoft Edge Add-ons Store
 1. Open Microsoft Edge.  
 2. Go to the [JudolShields Extension Page on Microsoft Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/dkhjiaepdbhlbeifodgjgiacpbifbalb).  
 3. Click “Get” or “Add” and confirm the installation.  
 4. The extension icon will appear in your browser toolbar.
 
 
-### However, if you're using the Chrome browser, you can manually install the extension from the build folder (dist) by following these steps:
+### Manual Installation (Chrome)
 1. Open Chrome.
 2. Visit ```chrome://extensions/```.
 3. Enable “Developer mode” (top-right toggle).
@@ -56,7 +65,7 @@ npm run build
 5. Select the ```dist``` folder from the project.
 6. The extension will appear in your list of extensions.
 
-## Together, We Fight Judol
+## Together We Fight Judol
 JudolShields is more than just a browser extension—it's a step toward a cleaner, safer internet for everyone.  
 By combining machine learning, real-time filtering, and community support, we aim to protect users from the growing threat of online gambling.
 
@@ -65,8 +74,13 @@ Your feedback, ideas, and support are what keep this project alive.
 
 Stay safe, stay aware—and always #SayNoToJudol.
 
+<br>
+
+[![top-language][img-shield-languange]][JavaScript]
+
 
 [JavaScript]: https://www.javascript.com/
 [Visual Studio Code]: https://code.visualstudio.com/
 
 [img-shield-languange]: https://img.shields.io/github/languages/top/atharianr/judol-shields-extension
+
