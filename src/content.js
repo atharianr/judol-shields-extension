@@ -1,12 +1,13 @@
-// instantImageBlur()
-
+if (process.env.NODE_ENV === 'development') require('./reload.js');
 import Analyzer from './analyzer.js';
 import ObserverManager from './observer_manager.js';
 import OverlayManager from './overlay_manager.js';
 import Sanitizer from './sanitizer.js';
+import Utils from './Utils.js';
 
-console.log("[SCRIPT LOADED] CONTENT.JS");
+console.log("[SCRIPT LOADED] CONTENT");
 
+// Ensure script runs when DOM is ready
 function onReady(callback) {
     if (document.readyState === "complete" || document.readyState === "interactive") {
         callback();
@@ -15,30 +16,41 @@ function onReady(callback) {
     }
 }
 
+// Main initialization function
 function init() {
-    injectTailwind();
+    const sanitizer = new Sanitizer();
+    const overlayManager = new OverlayManager();
+    const analyzer = new Analyzer(overlayManager);
+    const observerManager = new ObserverManager(sanitizer);
 
     chrome.storage.local.get(['featureEnabled'], (result) => {
-        const isFeatureEnabled = result.featureEnabled ?? false;
+        const isFeatureEnabled = result.featureEnabled ?? true;
 
         if (!isFeatureEnabled) {
-            console.log("[Feature Disabled] Skipping content script execution.");
+            console.log("[Content] Skipping content script execution.");
             return;
         }
 
-        console.log("[Feature Enabled] Running content script.");
+        console.log("[Content] Running content script.");
 
-        const sanitizer = new Sanitizer();
-        const overlayManager = new OverlayManager();
-        const analyzer = new Analyzer(overlayManager);
-        const observerManager = new ObserverManager(sanitizer);
+        requestIdleCallback(() => {
+            processImages(sanitizer)
+            observerManager.setup();
+        });
+
+        onReady(() => {
+            processImages(sanitizer)
+        });
+
+        // Get regex list to background
+        chrome.runtime.sendMessage({ type: "getRegexList" });
 
         sanitizer.loadFromCache(() => {
-            // Blur immediately after DOM is ready
             onReady(() => {
-                console.log("onReady")
-                sanitizer.sanitizeAll(document.body);
-                observerManager.setup();
+                console.log("[Content] DOM ready, beginning sanitization.");
+
+                // Sanitize text and future mutations
+                sanitizer.sanitizeAllTextNode(document.body);
             });
         });
 
@@ -46,31 +58,13 @@ function init() {
     });
 }
 
-function injectTailwind() {
-    const waitHead = () => {
-        if (document.head) {
-            if (!document.querySelector("#tailwind-injected")) {
-                const link = document.createElement("link");
-                link.id = "tailwind-injected";
-                link.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
-                link.rel = "stylesheet";
-                document.head.appendChild(link);
-            }
-        } else {
-            requestAnimationFrame(waitHead);
-        }
-    };
-    waitHead();
+function processImages(sanitizer) {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        const src = img.src;
+        if (Utils.shouldSkipImage?.(src)) return;
+        sanitizer.sanitizeImageNode(img);
+    });
 }
-
-// function instantImageBlur() {
-//     const style = document.createElement('style');
-//     style.textContent = `
-//         img {
-//             filter: blur(10px) !important;
-//         }
-//     `;
-//     document.documentElement.appendChild(style);
-// }
 
 init();
