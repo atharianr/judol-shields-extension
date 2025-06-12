@@ -8,7 +8,10 @@
 - [Project Installation](#project-installation)
 - [Build The Project](#build-the-project)
 - [Load Extension](#load-extension)
+  - [Install via Microsoft Edge Add-ons Store](#install-via-microsoft-edge-add-ons-store)
+  - [Manual Installation for Chrome](#manual-installation-for-chrome)
 - [Together We Fight Judol](#together-we-fight-judol)
+
 
 ## Overview
 JudolShields is a Chromium-based browser extension designed to protect Indonesian users from harmful online gambling ("judol") content. It proactively detects and blurs suspicious text and images, blocks dangerous links, and prevents access to gambling-related sites.
@@ -56,8 +59,7 @@ npm run build
 3. Click “Get” or “Add” and confirm the installation.  
 4. The extension icon will appear in your browser toolbar.
 
-
-### Manual Installation (Chrome)
+### Manual Installation for Chrome
 1. Open Chrome.
 2. Visit ```chrome://extensions/```.
 3. Enable “Developer mode” (top-right toggle).
