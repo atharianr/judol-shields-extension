@@ -4,7 +4,7 @@ import Utils from './Utils';
 import * as tf from '@tensorflow/tfjs';
 import Constant from './constant';
 
-console.log("[SCRIPT LOADED] BACKGROUND");
+console.log(`[${new Date().toLocaleTimeString()}] [SCRIPT LOADED] BACKGROUND`);
 
 class BackgroundService {
     constructor() {
@@ -125,6 +125,13 @@ class BackgroundService {
 
 
         chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+            if (message.type === "getRegexList") {
+                (async () => {
+                    await this.fetchAndCacheRegexes();
+                })();
+                return true;
+            }
+
             if (message.type === "analyzeWebsite") {
                 (async () => {
                     const result = await this.analyzeWebsite(message.payload);

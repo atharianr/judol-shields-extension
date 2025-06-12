@@ -42,6 +42,9 @@ function init() {
             processImages(sanitizer)
         });
 
+        // Get regex list to background
+        chrome.runtime.sendMessage({ type: "getRegexList" });
+
         sanitizer.loadFromCache(() => {
             onReady(() => {
                 console.log("[Content] DOM ready, beginning sanitization.");
