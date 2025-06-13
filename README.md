@@ -26,7 +26,7 @@ Key features:
 
 JudolShields helps reclaim digital wellbeing—one user at a time.
 
-[![Watch on YouTube](https://img.youtube.com/vi/XQWBu7YPZxs/0.jpg)](https://www.youtube.com/watch?v=XQWBu7YPZxs)
+[![Watch on YouTube](https://img.youtube.com/vi/6Qa0KTNOdOo/0.jpg)](https://www.youtube.com/watch?v=6Qa0KTNOdOo)
 
 ## Requirements
 - Code Editor ([Visual Studio Code] preferable)
