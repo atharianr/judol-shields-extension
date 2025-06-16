@@ -1,5 +1,6 @@
 if (process.env.NODE_ENV === 'development') require('./reload.js');
 import Analyzer from './analyzer.js';
+import Constant from './constant.js';
 import ObserverManager from './observer_manager.js';
 import OverlayManager from './overlay_manager.js';
 import Sanitizer from './sanitizer.js';
@@ -25,8 +26,14 @@ function init() {
 
     chrome.storage.local.get(['featureEnabled'], (result) => {
         const isFeatureEnabled = result.featureEnabled ?? true;
+        
+        const currentHost = window.location.hostname;
 
-        if (!isFeatureEnabled) {
+        const isWhitelisted = Constant.WHITELISTED_DOMAINS_ALL_FEATURE.some(domain =>
+            currentHost === domain || currentHost.endsWith("." + domain)
+        );
+
+        if (!isFeatureEnabled || isWhitelisted) {
             console.log("[Content] Skipping content script execution.");
             return;
         }

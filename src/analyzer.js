@@ -11,7 +11,7 @@ export default class Analyzer {
         const fullUrl = window.location.href;
 
         if (window.location.protocol.includes("extension:") ||
-            Constant.WHITELISTED_DOMAINS.some(allowed => domain.endsWith(allowed))) return;
+            Constant.WHITELISTED_DOMAINS_WEB_ANALYZER.some(allowed => domain.endsWith(allowed))) return;
 
         Utils.injectTailwind();
 
