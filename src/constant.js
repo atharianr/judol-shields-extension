@@ -1,5 +1,7 @@
 const Constant = {
-    API_BASE: "http://4.196.97.53:4527/api/v1",
+    // API_BASE: "http://4.196.97.53:4527/api/v1",
+    API_BASE: "http://4.197.192.158:4527/api/v1",
+    // API_BASE: "https://regex.bism.app/api/v1",
 
     MODEL_LABELS: ["judol", "non_judol"],
     MODEL_PATH: "model/gambling-v2/model.json",
